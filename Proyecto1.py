@@ -35,6 +35,5 @@ def main():
             print("Opción no válida. Por favor, intente de nuevo.")
 
 
-# Esta parte debe estar al final y fuera de cualquier función
 if __name__ == "__main__":
     main()
