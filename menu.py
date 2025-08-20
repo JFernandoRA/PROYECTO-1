@@ -1,0 +1,11 @@
+def mostrar_menu():
+    print("\n" + "="*40)
+    print("        MENÚ DE OPCIONES")
+    print("="*40)
+    print("1. Cargar Archivo")
+    print("2. Procesar Archivo")
+    print("3. Escribir Archivo de Salida")
+    print("4. Mostrar datos del Estudiante")
+    print("5. Generar Gráficas")
+    print("6. Salir")
+    print("="*40)
