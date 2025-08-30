@@ -27,3 +27,12 @@ class ListaSimple:
 
     def esta_vacia(self):
         return self.primero is None
+    
+    def obtener(self, indice):
+        actual = self.primero
+        for _ in range(indice):
+            if actual:
+                actual = actual.siguiente
+            else:
+                return None
+        return actual.dato if actual else None

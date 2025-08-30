@@ -1,6 +1,7 @@
 # procesador.py
 from estructuras.lista_simple import ListaSimple
 
+
 def calcular_patron(estacion_id, sensores):
     patron = []
     for sensor in sensores.recorrer():
@@ -12,48 +13,118 @@ def calcular_patron(estacion_id, sensores):
                 break
         if not encontrado:
             patron.append(0)
-    return tuple(patron)  # tuple para usar como clave
+    return tuple(patron)
+
 
 def procesar_campos(campos):
+ 
     if campos is None or campos.esta_vacia():
         print("No hay datos para procesar. Cargue un archivo primero.")
-        return
+        return None
+
+    campos_procesados = []
 
     for campo in campos.recorrer():
         print(f"\n--- PROCESANDO CAMPO: {campo.nombre} ---")
-
-        # Diccionario de agrupación por patrón (usando listas enlazadas)
         grupos_suelo = {}
         grupos_cultivo = {}
 
-        # Agrupar estaciones por patrón (sensores de suelo)
+     
         for estacion in campo.estaciones.recorrer():
             patron = calcular_patron(estacion.id, campo.sensores_suelo)
             if patron not in grupos_suelo:
                 grupos_suelo[patron] = ListaSimple()
             grupos_suelo[patron].insertar(estacion)
 
-        # Agrupar estaciones por patrón (sensores de cultivo)
+      
         for estacion in campo.estaciones.recorrer():
             patron = calcular_patron(estacion.id, campo.sensores_cultivo)
             if patron not in grupos_cultivo:
                 grupos_cultivo[patron] = ListaSimple()
             grupos_cultivo[patron].insertar(estacion)
 
-        # Mostrar resultados
-        print(f"  Estaciones agrupadas por patrón (Suelo):")
+        
+        print(f"\nMatriz de patrones (Suelo):")
+        for estacion in campo.estaciones.recorrer():
+            patron = calcular_patron(estacion.id, campo.sensores_suelo)
+            print(f"  {estacion.id} ({estacion.nombre}): {list(patron)}")
+
+        print(f"\nMatriz de patrones (Cultivo):")
+        for estacion in campo.estaciones.recorrer():
+            patron = calcular_patron(estacion.id, campo.sensores_cultivo)
+            print(f"  {estacion.id} ({estacion.nombre}): {list(patron)}")
+
+        print(f"\n Estaciones agrupadas por patrón (Suelo):")
         for patron, grupo in grupos_suelo.items():
-            nombres = []
-            for est in grupo.recorrer():
-                nombres.append(est.nombre)
-            print(f"    Patrón {list(patron)} → {', '.join(nombres)}")
+            nombres = [est.nombre for est in grupo.recorrer()]
+            print(f"  Patrón {list(patron)} → {', '.join(nombres)}")
 
-        print(f"  Estaciones agrupadas por patrón (Cultivo):")
+        print(f"\nEstaciones agrupadas por patrón (Cultivo):")
         for patron, grupo in grupos_cultivo.items():
-            nombres = []
-            for est in grupo.recorrer():
-                nombres.append(est.nombre)
-            print(f"    Patrón {list(patron)} → {', '.join(nombres)}")
+            nombres = [est.nombre for est in grupo.recorrer()]
+            print(f"  Patrón {list(patron)} → {', '.join(nombres)}")
 
-        # Aquí ya tienes los grupos. Puedes sumar frecuencias después
-        print(f"Procesamiento completado para {campo.nombre}")
+        # ✅ Construir estructura para salida.xml
+        campo_procesado = {
+            "id": campo.id,
+            "nombre": campo.nombre,
+            "estaciones_reducidas": [],
+            "sensores_suelo": [],
+            "sensores_cultivo": []
+        }
+
+        # Estaciones reducidas (usar primera del grupo como ID)
+        for patron, grupo in grupos_suelo.items():
+            estacion_repr = grupo.primero.dato
+            nombres_concatenados = ", ".join([est.nombre for est in grupo.recorrer()])
+            campo_procesado["estaciones_reducidas"].append({
+                "id": estacion_repr.id,
+                "nombre": nombres_concatenados
+            })
+
+        # Sensores de suelo (sumar frecuencias)
+        for sensor in campo.sensores_suelo.recorrer():
+            sensor_proc = {
+                "id": sensor.id,
+                "nombre": sensor.nombre,
+                "frecuencias": []
+            }
+            for patron, grupo in grupos_suelo.items():
+                total = 0
+                estacion_repr = grupo.primero.dato.id
+                for est in grupo.recorrer():
+                    for freq in sensor.frecuencias.recorrer():
+                        if freq["idEstacion"] == est.id:
+                            total += freq["valor"]
+                if total > 0:
+                    sensor_proc["frecuencias"].append({
+                        "idEstacion": estacion_repr,
+                        "valor": total
+                    })
+            campo_procesado["sensores_suelo"].append(sensor_proc)
+
+        # Sensores de cultivo (igual que suelo)
+        for sensor in campo.sensores_cultivo.recorrer():
+            sensor_proc = {
+                "id": sensor.id,
+                "nombre": sensor.nombre,
+                "frecuencias": []
+            }
+            for patron, grupo in grupos_cultivo.items():
+                total = 0
+                estacion_repr = grupo.primero.dato.id
+                for est in grupo.recorrer():
+                    for freq in sensor.frecuencias.recorrer():
+                        if freq["idEstacion"] == est.id:
+                            total += freq["valor"]
+                if total > 0:
+                    sensor_proc["frecuencias"].append({
+                        "idEstacion": estacion_repr,
+                        "valor": total
+                    })
+            campo_procesado["sensores_cultivo"].append(sensor_proc)
+
+        campos_procesados.append(campo_procesado)
+        print(f"\nProcesamiento completado para {campo.nombre}")
+
+    return campos_procesados

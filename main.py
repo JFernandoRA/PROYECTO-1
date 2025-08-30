@@ -1,15 +1,18 @@
-# main.py
 from tkinter import Tk
 import menu
 import lector_xml
 import estudiante
 import procesador
+import graficador
+from graphviz import Digraph
+from tkinter import messagebox, simpledialog
+from tkinter import filedialog
+import salida
 
-# Variable global para guardar los datos
+
 campos = None
 
 def main():
-    # Ocultar ventana de Tkinter
     Tk().withdraw()
 
     global campos
@@ -35,14 +38,65 @@ def main():
             if campos is None:
                 print("Primero debe procesar el archivo.")
             else:
-                print("Funcionalidad en desarrollo...")
+                print("Procesando campos para salida...")
+                campos_procesados = procesador.procesar_campos(campos)
+                if campos_procesados is None:
+                    continue
+                ruta_salida = filedialog.asksaveasfilename(
+                    title ="Guardar archivo de salida",
+                    defaultextension=".xml",
+                    filetypes=[("Archivos XML", "*.xml")]
+                )
+                
+                if ruta_salida:
+                    salida.generar_xml_salida(campos_procesados, ruta_salida)
+                else:
+                    print("No se seleccionó una ruta de salida.")
 
         elif opcion == '4':
             estudiante.DatosdelEstudiante()
-
+            
         elif opcion == '5':
-            print("Generar Gráficas")
-            print("Funcionalidad en desarrollo...")
+            if campos is None:
+                print("Primero debe cargar un archivo.")
+                continue
+
+            # Obtener lista de campos agrícolas
+            lista_campos = list(campos.recorrer())
+            if not lista_campos:
+                print("No hay campos cargados.")
+                continue
+
+            # Mostrar campos disponibles
+            print("\nCampos agrícolas disponibles:")
+            for i, campo in enumerate(lista_campos, start=1):
+                print(f"{i}. {campo.nombre} (ID: {campo.id})")
+
+            # Selección de campo
+            try:
+                idx = int(input("\nSeleccione un campo (número): ")) - 1
+                if idx < 0 or idx >= len(lista_campos):
+                    print("Número de campo no válido.")
+                    continue
+                campo_seleccionado = lista_campos[idx]
+            except ValueError:
+                print("Entrada no válida. Debe ingresar un número.")
+                continue
+
+            # Procesar campos (si es necesario para generar gráficas)
+            campos_procesados = None
+            try:
+                campos_procesados = procesador.procesar_campos(campos)
+            except Exception as e:
+                print(f"Error al procesar los campos: {e}")
+
+            # Llamar al menú del graficador
+            try:
+                graficador.menu_generar_graficas_proyecto(
+                    campo_seleccionado, campos_procesados
+                )
+            except Exception as e:
+                print(f"Error al generar gráficas: {e}")
 
         elif opcion == '6':
             print("Saliendo del programa...")
