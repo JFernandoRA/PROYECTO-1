@@ -61,18 +61,15 @@ def main():
                 print("Primero debe cargar un archivo.")
                 continue
 
-            # Obtener lista de campos agrícolas
             lista_campos = list(campos.recorrer())
             if not lista_campos:
                 print("No hay campos cargados.")
                 continue
 
-            # Mostrar campos disponibles
             print("\nCampos agrícolas disponibles:")
             for i, campo in enumerate(lista_campos, start=1):
                 print(f"{i}. {campo.nombre} (ID: {campo.id})")
 
-            # Selección de campo
             try:
                 idx = int(input("\nSeleccione un campo (número): ")) - 1
                 if idx < 0 or idx >= len(lista_campos):
@@ -83,14 +80,12 @@ def main():
                 print("Entrada no válida. Debe ingresar un número.")
                 continue
 
-            # Procesar campos (si es necesario para generar gráficas)
             campos_procesados = None
             try:
                 campos_procesados = procesador.procesar_campos(campos)
             except Exception as e:
                 print(f"Error al procesar los campos: {e}")
 
-            # Llamar al menú del graficador
             try:
                 graficador.menu_generar_graficas_proyecto(
                     campo_seleccionado, campos_procesados

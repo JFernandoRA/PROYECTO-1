@@ -1,14 +1,9 @@
-# graficador.py - Adaptado para Proyecto IPC2
 from graphviz import Digraph
 import os
 
 
 def generar_matriz_frecuencias(campo, tipo_sensor="suelo", nombre_archivo="matriz_frecuencias"):
-    """
-    Genera la matriz de frecuencias F[n,s] o F[n,t] según especificación del proyecto.
-    - F[n,s]: matriz de frecuencias para n estaciones base y s sensores de suelo
-    - F[n,t]: matriz de frecuencias para n estaciones base y t sensores de cultivo
-    """
+
     try:
         # Obtener datos según tipo de sensor
         estaciones = list(campo.estaciones.recorrer())
@@ -88,11 +83,7 @@ def generar_matriz_frecuencias(campo, tipo_sensor="suelo", nombre_archivo="matri
 
 
 def generar_matriz_patrones(campo, tipo_sensor="suelo", nombre_archivo="matriz_patrones"):
-    """
-    Genera la matriz de patrones Fp[n,s] o Fp[n,t] según especificación del proyecto.
-    - Fp[n,s]: matriz de patrones para sensores de suelo (1 si hay frecuencia, 0 si no)
-    - Fp[n,t]: matriz de patrones para sensores de cultivo (1 si hay frecuencia, 0 si no)
-    """
+
     try:
         estaciones = list(campo.estaciones.recorrer())
         if tipo_sensor == "suelo":
@@ -185,11 +176,7 @@ def generar_matriz_patrones(campo, tipo_sensor="suelo", nombre_archivo="matriz_p
 
 
 def generar_matriz_reducida(campo_procesado, tipo_sensor="suelo", nombre_archivo="matriz_reducida"):
-    """
-    Genera la matriz reducida Fr[n,s] o Fr[n,t] según especificación del proyecto.
-    - Fr[n,s]: matriz reducida para sensores de suelo después del agrupamiento
-    - Fr[n,t]: matriz reducida para sensores de cultivo después del agrupamiento
-    """
+ 
     try:
         estaciones_reducidas = campo_procesado.get("estaciones_reducidas", [])
         if tipo_sensor == "suelo":
@@ -272,10 +259,8 @@ def generar_matriz_reducida(campo_procesado, tipo_sensor="suelo", nombre_archivo
 
 
 def menu_generar_graficas_proyecto(campo, campos_procesados=None):
-    """
-    Menú específico para el proyecto IPC2 - Generar gráficas según especificación
-    """
-    print(f"\n=== GENERAR GRÁFICA - PROYECTO IPC2 ===")
+   
+    print(f"\n=== GENERAR GRÁFICA ===")
     print(f"Campo seleccionado: {campo.nombre} (ID: {campo.id})")
     
     estaciones = list(campo.estaciones.recorrer())

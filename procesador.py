@@ -64,7 +64,6 @@ def procesar_campos(campos):
             nombres = [est.nombre for est in grupo.recorrer()]
             print(f"  Patrón {list(patron)} → {', '.join(nombres)}")
 
-        # ✅ Construir estructura para salida.xml
         campo_procesado = {
             "id": campo.id,
             "nombre": campo.nombre,
@@ -73,7 +72,6 @@ def procesar_campos(campos):
             "sensores_cultivo": []
         }
 
-        # Estaciones reducidas (usar primera del grupo como ID)
         for patron, grupo in grupos_suelo.items():
             estacion_repr = grupo.primero.dato
             nombres_concatenados = ", ".join([est.nombre for est in grupo.recorrer()])
@@ -82,7 +80,6 @@ def procesar_campos(campos):
                 "nombre": nombres_concatenados
             })
 
-        # Sensores de suelo (sumar frecuencias)
         for sensor in campo.sensores_suelo.recorrer():
             sensor_proc = {
                 "id": sensor.id,
@@ -103,7 +100,6 @@ def procesar_campos(campos):
                     })
             campo_procesado["sensores_suelo"].append(sensor_proc)
 
-        # Sensores de cultivo (igual que suelo)
         for sensor in campo.sensores_cultivo.recorrer():
             sensor_proc = {
                 "id": sensor.id,

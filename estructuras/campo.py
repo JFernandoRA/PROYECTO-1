@@ -1,9 +1,6 @@
 from .lista_simple import ListaSimple
 from .Frecuencia import Frecuencia
 
-
-
-
 class Estacion:
     def __init__(self, id, nombre):
         self.id = id
